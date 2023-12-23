@@ -38,7 +38,7 @@ export function update(app: App) {
 export function draw(app: App, ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.strokeStyle = "green";
+  ctx.strokeStyle = "#0f0";
   ctx.lineCap = "round";
   ctx.lineWidth = 4;
   const fontWidth = 40;
