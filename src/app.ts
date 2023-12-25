@@ -18,6 +18,16 @@ type DeadLetter = {
   angle: number;
 };
 
+const colors = [
+  ["#000", "#0f0"],
+  ["#222323", "#f0f6f0"],
+  ["#004c3d", "#ffeaf9"],
+  ["#292b30", "#cfab4a"],
+  ["#323c39", "#d3c9a1"],
+  ["#0a2e44", "#fcffcc"],
+  ["#40318e", "#88d7de"],
+];
+
 export const create = () => ({
   curPos: 0,
   ms: 0,
@@ -25,9 +35,14 @@ export const create = () => ({
   lastTime: performance.now(),
   deadLetters: [] as DeadLetter[],
   freq: 440,
+  colorIndex: 0,
 });
 
 export function update(app: App) {
+  if (Input.justPressed.has("Shift")) {
+    app.colorIndex += 1;
+  }
+
   if (app.state == "done" && Input.keyQueue.includes("r")) {
     app.curPos = 0;
     app.ms = 0;
@@ -72,11 +87,15 @@ export function update(app: App) {
   }
 }
 
+function curColors(app: App) {
+  return colors[app.colorIndex % colors.length];
+}
+
 export function draw(app: App, ctx: CanvasRenderingContext2D) {
   const screen = Canvas.canvasRect();
-  ctx.fillStyle = "black";
+  ctx.fillStyle = curColors(app)[0];
   ctx.fillRect(0, 0, screen.width, screen.height);
-  ctx.strokeStyle = "#0f0";
+  ctx.strokeStyle = curColors(app)[1];
   ctx.lineCap = "round";
   ctx.lineWidth = 2;
   const fontWidth = 16;
@@ -123,7 +142,6 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
     const completed = app.curPos / text.length;
     const wordLength = text.split(" ").length;
     const expectedWPM = (wordLength * completed) / app.ms;
-    // draw expected at top center
     const wpmText = `${Math.round(expectedWPM * 60000) || 0} wpm`;
     const wpmLength = wpmText.length * fontWidth;
     const wpmXPos = screen.width / 2 - wpmLength / 2;
@@ -141,9 +159,10 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
   } else {
     ctx.save();
     ctx.globalAlpha = 0.65;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = curColors(app)[0];
     ctx.fillRect(0, 0, screen.width, screen.height);
     ctx.restore();
+
     const wpm = Math.round((text.split(" ").length / app.ms) * 60000);
     const lines = [`${wpm} wpm`, ``, `r to retry`];
     for (const [i, line] of lines.entries()) {
