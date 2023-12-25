@@ -43,7 +43,7 @@ export function update(app: App) {
         char: Input.keyQueue[0],
         x: 0,
         y: 0,
-        dx: Math.random() * 5 - 2.5,
+        dx: Math.random() * -2.5 - 1,
         dy: Math.random() * -4 - 4,
         angleDelta: Math.random() * 0.1 - 0.05,
         angle: 0,
@@ -88,8 +88,7 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
   };
 
   ctx.save();
-  ctx.strokeStyle = "#555";
-  ctx.translate(centeredChar.x, centeredChar.y);
+  ctx.translate(centeredChar.x - fontWidth, centeredChar.y);
   for (const deadLetter of app.deadLetters) {
     const charLines = Text.getCharLines(deadLetter.char);
     ctx.save();
