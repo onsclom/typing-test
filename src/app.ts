@@ -43,7 +43,7 @@ export function update(app: App) {
     app.colorIndex += 1;
   }
 
-  if (app.state == "done" && Input.keyQueue.includes("r")) {
+  if (Input.justPressed.has("Enter")) {
     app.curPos = 0;
     app.ms = 0;
     app.state = "waiting";
@@ -58,9 +58,9 @@ export function update(app: App) {
         char: Input.keyQueue[0],
         x: 0,
         y: 0,
-        dx: Math.random() * -2.5 - 1,
-        dy: Math.random() * -4 - 4,
-        angleDelta: Math.random() * 0.1 - 0.05,
+        dx: Math.random() * -1 - 1,
+        dy: 0,
+        angleDelta: Math.random() * -0.05,
         angle: 0,
       });
       app.curPos += 1;
@@ -97,7 +97,7 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
   ctx.fillRect(0, 0, screen.width, screen.height);
   ctx.strokeStyle = curColors(app)[1];
   ctx.lineCap = "round";
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1;
   const fontWidth = 16;
   const fontHeight = fontWidth * 2;
 
@@ -164,7 +164,13 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
     ctx.restore();
 
     const wpm = Math.round((text.split(" ").length / app.ms) * 60000);
-    const lines = [`${wpm} wpm`, ``, `r to retry`];
+    const lines = [
+      `${wpm} wpm`,
+      ``,
+      `enter to retry`,
+      ``,
+      `shift to change color`,
+    ];
     for (const [i, line] of lines.entries()) {
       const centeredLine = {
         x: screen.width / 2 - (fontWidth * line.length) / 2,
