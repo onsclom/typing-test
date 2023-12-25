@@ -9,13 +9,10 @@ const text = "the quick brown fox jumps over the lazy dog";
 
 type DeadLetter = {
   char: string;
-
   x: number;
   y: number;
-
   dx: number;
   dy: number;
-
   angleDelta: number;
   angle: number;
 };
@@ -124,7 +121,8 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
       Text.drawChar(ctx, charLines, xPos, 0, fontWidth, 5);
     }
   } else {
-    const lines = [`${app.ms} ms`, ``, `r to retry`];
+    const wpm = Math.round((text.split(" ").length / app.ms) * 60000);
+    const lines = [`${app.ms} ms`, ``, `${wpm} wpm`, ``, `r to retry`];
     for (const [i, line] of lines.entries()) {
       const centeredLine = {
         x: screen.width / 2 - (fontWidth * line.length) / 2,
