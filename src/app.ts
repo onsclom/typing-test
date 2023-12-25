@@ -1,6 +1,7 @@
 import * as Text from "./text";
 import * as Canvas from "./canvas";
 import * as Input from "./input";
+import * as Sound from "./sound";
 
 type App = ReturnType<typeof create>;
 
@@ -23,6 +24,7 @@ export const create = () => ({
   state: "waiting" as "waiting" | "playing" | "done",
   lastTime: performance.now(),
   deadLetters: [] as DeadLetter[],
+  freq: 440,
 });
 
 export function update(app: App) {
@@ -32,6 +34,7 @@ export function update(app: App) {
     app.state = "waiting";
     Input.keyQueue.splice(0, Input.keyQueue.length);
     app.deadLetters.splice(0, app.deadLetters.length);
+    Sound.resetFreq();
   }
 
   while (Input.keyQueue.length > 0) {
@@ -46,8 +49,13 @@ export function update(app: App) {
         angle: 0,
       });
       app.curPos += 1;
+      Sound.playGoodSound();
+      Sound.incFreq();
+
       if (app.state === "waiting") app.state = "playing";
       else if (app.curPos === text.length) app.state = "done";
+    } else {
+      Sound.playBadSound();
     }
     Input.keyQueue.shift();
   }
@@ -65,14 +73,14 @@ export function update(app: App) {
 }
 
 export function draw(app: App, ctx: CanvasRenderingContext2D) {
+  const screen = Canvas.canvasRect();
   ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.fillRect(0, 0, screen.width, screen.height);
   ctx.strokeStyle = "#0f0";
   ctx.lineCap = "round";
   ctx.lineWidth = 4;
-  const fontWidth = 40;
+  const fontWidth = 30;
   const fontHeight = fontWidth * 2;
-  const screen = Canvas.canvasRect();
 
   const centeredChar = {
     x: screen.width / 2 - fontWidth / 2,
