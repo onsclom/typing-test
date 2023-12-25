@@ -78,8 +78,8 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
   ctx.fillRect(0, 0, screen.width, screen.height);
   ctx.strokeStyle = "#0f0";
   ctx.lineCap = "round";
-  ctx.lineWidth = 4;
-  const fontWidth = 30;
+  ctx.lineWidth = 2;
+  const fontWidth = 16;
   const fontHeight = fontWidth * 2;
 
   const centeredChar = {
@@ -101,8 +101,8 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
     Text.drawChar(ctx, charLines, 0, 0, fontWidth, 5);
     ctx.restore();
   }
-
   ctx.restore();
+
   if (app.curPos < text.length) {
     ctx.beginPath();
     ctx.moveTo(centeredChar.x, centeredChar.y + fontHeight * 1.5);
@@ -120,16 +120,32 @@ export function draw(app: App, ctx: CanvasRenderingContext2D) {
     }
     ctx.restore();
 
-    const msText = `${app.ms} ms`;
-    const length = msText.length * fontWidth;
-    for (const [i, char] of msText.split("").entries()) {
-      const xPos = screen.width - length + i * fontWidth;
+    const completed = app.curPos / text.length;
+    const wordLength = text.split(" ").length;
+    const expectedWPM = (wordLength * completed) / app.ms;
+    // draw expected at top center
+    const wpmText = `${Math.round(expectedWPM * 60000) || 0} wpm`;
+    const wpmLength = wpmText.length * fontWidth;
+    const wpmXPos = screen.width / 2 - wpmLength / 2;
+    for (const [i, char] of wpmText.split("").entries()) {
       const charLines = Text.getCharLines(char);
-      Text.drawChar(ctx, charLines, xPos, 0, fontWidth, 5);
+      Text.drawChar(
+        ctx,
+        charLines,
+        wpmXPos + i * fontWidth,
+        fontWidth / 2,
+        fontWidth,
+        5
+      );
     }
   } else {
+    ctx.save();
+    ctx.globalAlpha = 0.65;
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, screen.width, screen.height);
+    ctx.restore();
     const wpm = Math.round((text.split(" ").length / app.ms) * 60000);
-    const lines = [`${app.ms} ms`, ``, `${wpm} wpm`, ``, `r to retry`];
+    const lines = [`${wpm} wpm`, ``, `r to retry`];
     for (const [i, line] of lines.entries()) {
       const centeredLine = {
         x: screen.width / 2 - (fontWidth * line.length) / 2,
